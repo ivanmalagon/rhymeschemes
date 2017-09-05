@@ -1,0 +1,84 @@
+<audio ref:audio id='pepino' src={{source}}></audio>
+<div ref:progressBar class="foo">
+  <div class="scrobber" style="left: {{progress + 'px'}}"></div>
+</div>
+{{#if playerAvailable}}
+  <button on:click='play()'>Play</button>
+  <button on:click='pause()'>Pause</button>
+  <button on:click='rewind()'>Rewind</button>
+  <p>{{currentTime}}</p>
+{{/if}}
+<button on:click='toggle()'>Toggle</button>
+
+<script>
+  export default {
+    oncreate () {
+      const audioTag = this.refs.audio;
+      window.audioTag = this.refs.audio;
+      window.progressBar = this.refs.progressBar;
+
+      let destroyed = false;
+      this.on( 'destroy', () => destroyed = true );
+
+      const loop = () => {
+        if ( destroyed ) return;
+        requestAnimationFrame( loop );
+
+        let progress = audioTag.currentTime / audioTag.duration;
+        this.set({progress: Math.round(progress * this.refs.progressBar.clientWidth)});
+        this.set({currentTime: progress});
+      }
+
+      loop();
+    },
+
+    data () {
+      return {
+        source: 'audio/kojan.mp3',
+        currentTime: null,
+        playerAvailable: true,
+        progress: 0
+      };
+    },
+
+    methods: {
+      play: function () {
+        const audioTag = this.refs.audio;
+        audioTag.play();
+      },
+      pause: function () {
+        const audioTag = this.refs.audio;
+        audioTag.pause();
+      },
+      rewind: function () {
+        const audioTag = this.refs.audio;
+        audioTag.currentTime = 0;
+      },
+      onTimeUpdate: function () {
+        const audioTag = this.refs.audio;
+        this.set({currentTime: Math.floor(audioTag.currentTime)});
+      },
+      toggle: function () {
+        this.set({playerAvailable: !this.get('playerAvailable')});
+      }
+    }
+  };
+</script>
+
+<style>
+  .foo {
+    min-height: 8px;
+    background-color: black;
+    width: 100%;
+    position: relative;
+  }
+
+  .scrobber {
+    min-height: 8px;
+    min-width: 8px;
+    background-color: green;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+  }
+</style>
