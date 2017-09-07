@@ -1,7 +1,21 @@
-<audio ref:audio id='pepino' src={{source}}></audio>
-<div ref:progressBar class="foo">
-  <div class="scrobber" style="left: {{progress + 'px'}}"></div>
+<div ref:progressBar on:click='onPlayerClicked()'>
+  <svg width="{{playerWidth}}px" height="24px" viewBox="0 0 {{playerWidth}} 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <circle id="path-1" cx="{{scrubberPos}}" cy="12" r="12"></circle>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" class="hoverable">
+            <rect id="Rectangle-Copy" fill="#D8D8D8" x="2" y="11" width="{{completedWidth}}" height="7" rx="3.5"></rect>
+            <rect id="Rectangle" stroke="#000000" stroke-width="2" x="6" y="9" width="{{timelineWidth}}" height="6" rx="3"></rect>
+            <g id="Oval">
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                <circle stroke="#000000" stroke-width="2" cx="{{scrubberPos}}" cy="12" r="11"></circle>
+            </g>
+        </g>
+    </g>
+  </svg>
 </div>
+<audio ref:audio id='pepino' src={{source}}></audio>
 {{#if playerAvailable}}
   <button on:click='play()'>Play</button>
   <button on:click='pause()'>Pause</button>
@@ -15,7 +29,7 @@
     oncreate () {
       const audioTag = this.refs.audio;
       window.audioTag = this.refs.audio;
-      window.progressBar = this.refs.progressBar;
+      this.set({playerWidth: this.refs.progressBar.clientWidth});
 
       let destroyed = false;
       this.on( 'destroy', () => destroyed = true );
@@ -25,7 +39,7 @@
         requestAnimationFrame( loop );
 
         let progress = audioTag.currentTime / audioTag.duration;
-        this.set({progress: Math.round(progress * this.refs.progressBar.clientWidth)});
+        this.set({progress: progress});
         this.set({currentTime: progress});
       }
 
@@ -37,8 +51,21 @@
         source: 'audio/kojan.mp3',
         currentTime: null,
         playerAvailable: true,
-        progress: 0
+        progress: 0,
+        playerWidth: 500,
+        timelineWidth: 400,
+        completedWidth: 250
       };
+    },
+
+    computed: {
+      timelineWidth: playerWidth => playerWidth - 32,
+      scrubberPos: (progress, timelineWidth) => {
+        const pos = (timelineWidth * progress + 12).toFixed(1);
+        return isNaN(pos)
+          ? 0
+          : pos;
+      }
     },
 
     methods: {
@@ -58,27 +85,21 @@
         const audioTag = this.refs.audio;
         this.set({currentTime: Math.floor(audioTag.currentTime)});
       },
+      onPlayerClicked: function () {
+        debugger;
+      },
       toggle: function () {
         this.set({playerAvailable: !this.get('playerAvailable')});
+      },
+      kakota: function () {
+        console.log('Soy kakota()');
       }
     }
   };
 </script>
 
 <style>
-  .foo {
-    min-height: 8px;
-    background-color: black;
-    width: 100%;
-    position: relative;
-  }
-
-  .scrobber {
-    min-height: 8px;
-    min-width: 8px;
-    background-color: green;
-    position: absolute;
-    top: 0px;
-    left: 0px;
+  .hoverable {
+    cursor: pointer;
   }
 </style>
