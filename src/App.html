@@ -25,8 +25,19 @@
 <button on:click='toggle()'>Toggle</button>
 
 <script>
+  import { autorun } from 'mobx';
+  import store from './store/store';
+
   export default {
     oncreate () {
+      // Connect mobx
+      this.autorunDisposer = autorun(() => {
+        this.set({
+          currentTime: store.currentTime
+        });
+      });
+
+
       const audioTag = this.refs.audio;
       window.audioTag = this.refs.audio;
       this.set({playerWidth: this.refs.progressBar.clientWidth});
@@ -40,7 +51,7 @@
 
         let progress = audioTag.currentTime / audioTag.duration;
         this.set({progress: progress});
-        this.set({currentTime: progress});
+        store.currentTime = progress;
       }
 
       loop();
@@ -49,7 +60,7 @@
     data () {
       return {
         source: 'audio/kojan.mp3',
-        currentTime: null,
+        currentTime: 0,
         playerAvailable: true,
         progress: 0,
         playerWidth: 500,
@@ -83,7 +94,7 @@
       },
       onTimeUpdate: function () {
         const audioTag = this.refs.audio;
-        this.set({currentTime: Math.floor(audioTag.currentTime)});
+        store.currentTime = Math.floor(audioTag.currentTime);
       },
       onPlayerClicked: function () {
         debugger;

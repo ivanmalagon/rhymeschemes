@@ -15,5 +15,8 @@
     "build": "rollup -c",
     "dev": "serve public & rollup -c -w",
     "start": "serve public"
+  },
+  "dependencies": {
+    "mobx": "^3.2.2"
   }
 }
