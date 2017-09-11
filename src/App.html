@@ -1,4 +1,4 @@
-<div ref:progressBar on:click='onPlayerClicked()'>
+<div ref:progressBar>
   <svg width="{{playerWidth}}px" height="24px" viewBox="0 0 {{playerWidth}} 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
         <circle id="path-1" cx="{{scrubberPos}}" cy="12" r="12"></circle>
@@ -21,11 +21,12 @@
   <button on:click='pause()'>Pause</button>
   <button on:click='rewind()'>Rewind</button>
   <p>{{currentTime}}</p>
+  <p>4x {{extraTime}}</p>
 {{/if}}
 <button on:click='toggle()'>Toggle</button>
 
 <script>
-  import { autorun } from 'mobx';
+  import { autorun, action } from 'mobx';
   import store from './store/store';
 
   export default {
@@ -33,12 +34,12 @@
       // Connect mobx
       this.autorunDisposer = autorun(() => {
         this.set({
-          currentTime: store.currentTime
+          currentTime: store.currentTime,
+          extraTime: store.time
         });
       });
 
-
-      const audioTag = this.refs.audio;
+      this.audioTag = this.refs.audio;
       window.audioTag = this.refs.audio;
       this.set({playerWidth: this.refs.progressBar.clientWidth});
 
@@ -51,7 +52,7 @@
 
         let progress = audioTag.currentTime / audioTag.duration;
         this.set({progress: progress});
-        store.currentTime = progress;
+        this.setCurrentTime(progress);
       }
 
       loop();
@@ -59,7 +60,7 @@
 
     data () {
       return {
-        source: 'audio/kojan.mp3',
+        source: 'audio/macgyver.mp3',
         currentTime: 0,
         playerAvailable: true,
         progress: 0,
@@ -81,30 +82,22 @@
 
     methods: {
       play: function () {
-        const audioTag = this.refs.audio;
-        audioTag.play();
+        this.audioTag.play();
       },
       pause: function () {
-        const audioTag = this.refs.audio;
-        audioTag.pause();
+        this.audioTag.pause();
       },
       rewind: function () {
-        const audioTag = this.refs.audio;
-        audioTag.currentTime = 0;
-      },
-      onTimeUpdate: function () {
-        const audioTag = this.refs.audio;
-        store.currentTime = Math.floor(audioTag.currentTime);
-      },
-      onPlayerClicked: function () {
-        debugger;
+        this.audioTag.currentTime = 0;
       },
       toggle: function () {
         this.set({playerAvailable: !this.get('playerAvailable')});
       },
-      kakota: function () {
-        console.log('Soy kakota()');
-      }
+      setCurrentTime: (() => {
+        return action('SET_CURRENT_TIME', function (currentTime) {
+          store.currentTime = currentTime;
+        });
+      })()
     }
   };
 </script>
