@@ -1,12 +1,20 @@
 import { observable, extendObservable, computed } from 'mobx';
 
 const store = observable({
- currentTime: 0
+ time: 0,
+ progress: 0,
+ tempo: 85
 });
 
 extendObservable(store, {
-  time: computed(function () {
-    return store.currentTime * 4;
+  position: computed(function () {
+    var barDuration = (60 / store.tempo) * 4;
+    var toTempo = (store.time / barDuration) + 1;
+    var tick = Math.floor((toTempo % 1) * 8) + 1;
+    return {
+      bar: Math.floor(toTempo),
+      tick: tick
+    };
   })
 });
 

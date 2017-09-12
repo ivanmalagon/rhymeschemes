@@ -20,8 +20,8 @@
   <button on:click='play()'>Play</button>
   <button on:click='pause()'>Pause</button>
   <button on:click='rewind()'>Rewind</button>
-  <p>{{currentTime}}</p>
-  <p>4x {{extraTime}}</p>
+  <p>{{Math.floor(time)}}</p>
+  <p>{{position.bar}}.{{position.tick}}</p>
 {{/if}}
 <button on:click='toggle()'>Toggle</button>
 
@@ -34,8 +34,9 @@
       // Connect mobx
       this.autorunDisposer = autorun(() => {
         this.set({
-          currentTime: store.currentTime,
-          extraTime: store.time
+          time: store.time,
+          progress: store.progress,
+          position: store.position
         });
       });
 
@@ -51,8 +52,8 @@
         requestAnimationFrame( loop );
 
         let progress = audioTag.currentTime / audioTag.duration;
-        this.set({progress: progress});
-        this.setCurrentTime(progress);
+        this.setProgress(progress);
+        this.setTime(audioTag.currentTime);
       }
 
       loop();
@@ -61,9 +62,13 @@
     data () {
       return {
         source: 'audio/macgyver.mp3',
-        currentTime: 0,
+        time: 0,
         playerAvailable: true,
         progress: 0,
+        position: {
+          bar: 1,
+          tick: 1
+        },
         playerWidth: 500,
         timelineWidth: 400,
         completedWidth: 250
@@ -93,9 +98,14 @@
       toggle: function () {
         this.set({playerAvailable: !this.get('playerAvailable')});
       },
-      setCurrentTime: (() => {
-        return action('SET_CURRENT_TIME', function (currentTime) {
-          store.currentTime = currentTime;
+      setTime: (() => {
+        return action('SET_CURRENT_TIME', function (time) {
+          store.time = time;
+        });
+      })(),
+      setProgress: (() => {
+        return action('SET_PROGRESS', function (progress) {
+          store.progress = progress;
         });
       })()
     }
