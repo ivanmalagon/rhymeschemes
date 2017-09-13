@@ -4,5 +4,5 @@ import App from './App.html';
 useStrict(true);
 
 window.app = new App({
-	target: document.body
+  target: document.body
 });

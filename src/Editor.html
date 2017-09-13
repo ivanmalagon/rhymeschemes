@@ -1,0 +1,39 @@
+<div class="editor" ref:editor contenteditable="true" on:keyup="onKeyUp(event)"></div>
+
+<script>
+  import { action } from 'mobx';
+  import store from './store/store';
+
+  export default {
+    oncreate () {
+      window.editor = this.refs.editor;
+    },
+
+    data () {
+      return {
+        lyrics: ''
+      };
+    },
+
+    methods: {
+      onKeyUp: function (event) {
+        this.updateLyrics(this.refs.editor.textContent);
+      },
+      updateLyrics: (() => {
+        return action('UPDATE_LYRICS', function (lyrics) {
+          store.lyrics = lyrics;
+        });
+      })()
+    }
+  };
+</script>
+
+<style>
+  .editor {
+    flex-grow: 0.5;
+    font-family: Courier New, Courier, monospace;
+    background-color: #ECCE87;
+    min-height: 64px;
+    outline: none;
+  }
+</style>

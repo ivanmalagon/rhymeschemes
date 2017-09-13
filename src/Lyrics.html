@@ -1,0 +1,30 @@
+<div class="lyrics">{{lyrics}}</div>
+
+<script>
+  import { autorun } from 'mobx';
+  import store from './store/store';
+
+  export default {
+    oncreate () {
+      // Connect mobx
+      this.autorunDisposer = autorun(() => {
+        this.set({
+          lyrics: store.lyrics
+        });
+      });
+    },
+
+    data () {
+      return {
+        lyrics: ''
+      };
+    }
+  };
+</script>
+
+<style>
+  .lyrics {
+    flex-grow: 0.5;
+    font-family: Courier New, Courier, monospace;
+  }
+</style>

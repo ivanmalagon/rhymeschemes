@@ -1,119 +1,30 @@
-<div ref:progressBar>
-  <svg width="{{playerWidth}}px" height="24px" viewBox="0 0 {{playerWidth}} 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <defs>
-        <circle id="path-1" cx="{{scrubberPos}}" cy="12" r="12"></circle>
-    </defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Group" class="hoverable">
-            <rect id="Rectangle-Copy" fill="#D8D8D8" x="2" y="11" width="{{completedWidth}}" height="7" rx="3.5"></rect>
-            <rect id="Rectangle" stroke="#000000" stroke-width="2" x="6" y="9" width="{{timelineWidth}}" height="6" rx="3"></rect>
-            <g id="Oval">
-                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
-                <circle stroke="#000000" stroke-width="2" cx="{{scrubberPos}}" cy="12" r="11"></circle>
-            </g>
-        </g>
-    </g>
-  </svg>
+<div id="app">
+  <Player></Player>
+  <div class="panel">
+    <Editor></Editor>
+    <Lyrics></Lyrics>
+  </div>
 </div>
-<audio ref:audio id='pepino' src={{source}}></audio>
-{{#if playerAvailable}}
-  <button on:click='play()'>Play</button>
-  <button on:click='pause()'>Pause</button>
-  <button on:click='rewind()'>Rewind</button>
-  <p>{{Math.floor(time)}}</p>
-  <p>{{position.bar}}.{{position.tick}}</p>
-{{/if}}
-<button on:click='toggle()'>Toggle</button>
 
 <script>
-  import { autorun, action } from 'mobx';
-  import store from './store/store';
+  import Player from './Player.html';
+  import Editor from './Editor.html';
+  import Lyrics from './Lyrics.html';
 
   export default {
-    oncreate () {
-      // Connect mobx
-      this.autorunDisposer = autorun(() => {
-        this.set({
-          time: store.time,
-          progress: store.progress,
-          position: store.position
-        });
-      });
-
-      this.audioTag = this.refs.audio;
-      window.audioTag = this.refs.audio;
-      this.set({playerWidth: this.refs.progressBar.clientWidth});
-
-      let destroyed = false;
-      this.on( 'destroy', () => destroyed = true );
-
-      const loop = () => {
-        if ( destroyed ) return;
-        requestAnimationFrame( loop );
-
-        let progress = audioTag.currentTime / audioTag.duration;
-        this.setProgress(progress);
-        this.setTime(audioTag.currentTime);
-      }
-
-      loop();
-    },
-
-    data () {
-      return {
-        source: 'audio/macgyver.mp3',
-        time: 0,
-        playerAvailable: true,
-        progress: 0,
-        position: {
-          bar: 1,
-          tick: 1
-        },
-        playerWidth: 500,
-        timelineWidth: 400,
-        completedWidth: 250
-      };
-    },
-
-    computed: {
-      timelineWidth: playerWidth => playerWidth - 32,
-      scrubberPos: (progress, timelineWidth) => {
-        const pos = (timelineWidth * progress + 12).toFixed(1);
-        return isNaN(pos)
-          ? 0
-          : pos;
-      }
-    },
-
-    methods: {
-      play: function () {
-        this.audioTag.play();
-      },
-      pause: function () {
-        this.audioTag.pause();
-      },
-      rewind: function () {
-        this.audioTag.currentTime = 0;
-      },
-      toggle: function () {
-        this.set({playerAvailable: !this.get('playerAvailable')});
-      },
-      setTime: (() => {
-        return action('SET_CURRENT_TIME', function (time) {
-          store.time = time;
-        });
-      })(),
-      setProgress: (() => {
-        return action('SET_PROGRESS', function (progress) {
-          store.progress = progress;
-        });
-      })()
+    components: {
+      Player,
+      Editor,
+      Lyrics
     }
   };
 </script>
 
 <style>
-  .hoverable {
-    cursor: pointer;
+  .panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
   }
 </style>

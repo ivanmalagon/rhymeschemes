@@ -3,7 +3,8 @@ import { observable, extendObservable, computed } from 'mobx';
 const store = observable({
  time: 0,
  progress: 0,
- tempo: 85
+ tempo: 85,
+ lyrics: ''
 });
 
 extendObservable(store, {
