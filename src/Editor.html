@@ -1,39 +1,140 @@
-<div class="editor" ref:editor contenteditable="true" on:keyup="onKeyUp(event)"></div>
+<div class="editor" ref:editor>
+  <p>width: {{areaWidth}} chars: {{areaWidth}}</p>
+  <div ref:textarea class="mierda" contenteditable="true" on:input="onValueChanged(event)"></div>
+  <input ref:texto type="text" on:input="onInputChanged(event)">
+  <div class="bloque"></div>
+  {{#if !measured}}
+    <p class="measure" ref:measure>X</p>
+  {{/if}}
+</div>
 
 <script>
-  import { action } from 'mobx';
+  import { action, autorun } from 'mobx';
   import store from './store/store';
+  import splitter from './helpers/splitter';
 
   export default {
     oncreate () {
-      window.editor = this.refs.editor;
+      window.textarea = this.refs.textarea;
+      window.measure = this.refs.measure;
+      window.texto = this.refs.texto;
+      document.execCommand('DefaultParagraphSeparator', false, 'span');
+      // Connect mobx
+      this.autorunDisposer = autorun(() => {
+        this.set({
+          bars: store.bars
+        });
+      });
+
+      window.addEventListener('resize', (event) => this.calculateHowManyChars());
+
+      this.measureFont();
     },
 
     data () {
       return {
-        lyrics: ''
+        bars: [],
+        inputs: [],
+        measured: false,
+        fontWidth: 0,
+        areaWidth: 0
       };
+    },
+
+    computed: {
+      inputs: (bars) => {
+        const inputs = bars && bars.length > 0
+          ? bars.map((value, index) => {
+              const input = {
+                number: index,
+                bar: value
+              }
+              return input;
+            })
+          : [];
+        console.log(JSON.stringify(inputs));
+        return inputs;
+      }
     },
 
     methods: {
       onKeyUp: function (event) {
-        this.updateLyrics(this.refs.editor.textContent);
+        //event.preventDefault();
+        event.stopPropagation();
+        const upperText = event.target.textContent.toUpperCase();
+        this.updateLyrics(upperText);
+      },
+      onPaste: function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const clipboardData = event.clipboardData || window.clipboardData;
+        const pastedData = clipboardData.getData('Text');
+        this.updateLyrics(pastedData);
       },
       updateLyrics: (() => {
         return action('UPDATE_LYRICS', function (lyrics) {
           store.lyrics = lyrics;
+          console.log('store [', store.lyrics, ']');
         });
-      })()
+      })(),
+      measureFont: function () {
+        const width = this.refs.measure.getBoundingClientRect().width;
+        this.set({
+          measured: true,
+          fontWidth: width
+        });
+        this.calculateHowManyChars();
+      },
+      calculateHowManyChars: function () {
+        const w = this.refs.textarea.getBoundingClientRect().width;
+        const f = this.get('fontWidth');
+        const d = w / f;
+        const rw = Math.floor(w);
+        const rf = Math.ceil(f);
+        const rd = rw / f;
+
+        console.log('', w, '/', f, '=', d, ' | ', rw, '/', f, '=', rd); 
+        this.set({ areaWidth: w, chars: d });
+      },
+      onValueChanged: function (event) {
+        //console.log(splitter(this.refs.textarea.value, this.get('areaWidth')));
+      },
+      onInputChanged: function (event) {
+        debugger;
+        console.log(this.refs.texto.selectionEnd);
+      }
     }
   };
 </script>
 
 <style>
   .editor {
-    flex-grow: 0.5;
-    font-family: Courier New, Courier, monospace;
-    background-color: #ECCE87;
-    min-height: 64px;
+    flex-grow: 1;
+    position: relative;
+    font-family: 'Overpass Mono', Courier New, Courier, monospace;
+  }
+  .mierda {
+    background-color: #000;
+    color: greenyellow;
     outline: none;
+    width: 12em;
+    height: 200px;
+    resize: none;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  .bloque {
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    background-color: pink;
+  }
+  .measure {
+    position: absolute;
+    top: 0;
+    left: -9999;
+    margin: 0;
+    padding: 0;
   }
 </style>

@@ -1,4 +1,10 @@
-<div class="lyrics">{{lyrics}}</div>
+<div class="bars">
+  <ul>
+  {{#each parsedBars as bar}}
+    <li class="{{barStyle(bar.index)}}">{{bar.index}} {{bar.text}}</li>
+  {{/each}}
+  </ul>
+</div>
 
 <script>
   import { autorun } from 'mobx';
@@ -9,22 +15,57 @@
       // Connect mobx
       this.autorunDisposer = autorun(() => {
         this.set({
-          lyrics: store.lyrics
+          bars: store.bars,
+          position: store.position
         });
       });
     },
 
     data () {
       return {
-        lyrics: ''
+        bars: [],
+        position: {
+          bar: 0,
+          tick: 1
+        }
       };
+    },
+
+    computed: {
+      parsedBars: (bars) => {
+        return bars.map((bar, index) => {
+          return {
+            index: index + 1,
+            text: bar
+          };
+        })
+      },
+      barStyle: (position) => {
+        return (index) => {
+          return position.bar > index
+            ? 'past'
+            : position.bar === index
+              ? 'current'
+              : '';
+        };
+      }
     }
   };
 </script>
 
 <style>
-  .lyrics {
-    flex-grow: 0.5;
+  .bars {
+    flex-grow: 1;
     font-family: Courier New, Courier, monospace;
+  }
+  ul {
+    list-style-type: none;
+  }
+  .past {
+    font-weight: bold;
+  }
+  .current {
+    font-weight: bold;
+    color: blueviolet;
   }
 </style>

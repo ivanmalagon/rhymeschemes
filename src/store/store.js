@@ -1,10 +1,15 @@
 import { observable, extendObservable, computed } from 'mobx';
 
 const store = observable({
- time: 0,
- progress: 0,
- tempo: 85,
- lyrics: ''
+  time: 0,
+  progress: 0,
+  tempo: 85,
+  bars: [
+    'Hey pijo de que vas',
+    'tanto mirarme te voy machacar',
+    'de que me miras de arriba a abajo',
+    'te voy dar en la cara un cadenazo.'
+  ]
 });
 
 extendObservable(store, {
