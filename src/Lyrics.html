@@ -1,7 +1,18 @@
 <div class="bars">
   <ul>
   {{#each parsedBars as bar}}
-    <li class="{{barStyle(bar.index)}}">{{bar.index}} {{bar.text}}</li>
+    <li>
+      <ul>
+        <li>
+          <span>{{bar.index}}</span>
+          {{#each bar.spans as span}}
+            {{#if span}}
+              <span class="{{spanStyle(bar.index, span.tick)}}">{{span.text}}</span>
+            {{/if}}
+          {{/each}}
+        </li>
+      </ul>
+    </li>
   {{/each}}
   </ul>
 </div>
@@ -9,13 +20,19 @@
 <script>
   import { autorun } from 'mobx';
   import store from './store/store';
+  import spanner from './helpers/spanner'
 
   export default {
     oncreate () {
       // Connect mobx
       this.autorunDisposer = autorun(() => {
         this.set({
-          bars: store.bars,
+          bars: store.bars
+        });
+      });
+
+      this.autorunDisposer = autorun(() => {
+        this.set({
           position: store.position
         });
       });
@@ -33,12 +50,17 @@
 
     computed: {
       parsedBars: (bars) => {
-        return bars.map((bar, index) => {
+        const result = bars.map((bar, index) => {
+          const spans = spanner(bar);
           return {
             index: index + 1,
-            text: bar
+            text: bar,
+            spans: spans
           };
-        })
+        });
+
+        console.log(result);
+        return result;
       },
       barStyle: (position) => {
         return (index) => {
@@ -46,6 +68,19 @@
             ? 'past'
             : position.bar === index
               ? 'current'
+              : '';
+        };
+      },
+      spanStyle: (position) => {
+        return (bar, tick) => {
+          return bar < position.bar
+            ? 'past'
+            : bar === position.bar
+              ? tick < position.tick
+                ? 'past'
+                : tick === position.tick
+                  ? 'current'
+                  : ''
               : '';
         };
       }

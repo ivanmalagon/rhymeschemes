@@ -5,10 +5,10 @@ const store = observable({
   progress: 0,
   tempo: 85,
   bars: [
-    'Hey pijo de que vas',
-    'tanto mirarme te voy machacar',
-    'de que me miras de arriba a abajo',
-    'te voy dar en la cara un cadenazo.'
+    'Hey *3pijo *4de *5que *7vas',
+    'tan*2to mi*3rarme *4te *5voy a *6macha*7car',
+    'de que me *3miras de *5arriba a *7abajo',
+    'te voy a *3dar en la *5cara un cade*7nazo.'
   ]
 });
 
