@@ -1,3 +1,5 @@
+import styler from './styler';
+
 const spanner = function (line) {
   const maxTick = 8;
   let text = line;
@@ -34,6 +36,7 @@ const spanner = function (line) {
           spans[i - 1].text = i === maxToken
             ? line.substring(spans[i - 1].start)
             : line.substring(spans[i - 1].start, spans[j - 1].index);
+          spans[i - 1].slices = styler(spans[i - 1].text);
         }
       }
     }

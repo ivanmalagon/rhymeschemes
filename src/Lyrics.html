@@ -7,7 +7,11 @@
           <span>{{bar.index}}</span>
           {{#each bar.spans as span}}
             {{#if span}}
-              <span class="{{spanStyle(bar.index, span.tick)}}">{{span.text}}</span>
+              <span class="{{spanStyle(bar.index, span.tick)}}">
+                {{#each span.slices as slice}}
+                  <span class={{slice.style || ''}}>{{slice.text}}</span>
+                {{/each}}
+              </span>
             {{/if}}
           {{/each}}
         </li>
@@ -20,7 +24,7 @@
 <script>
   import { autorun } from 'mobx';
   import store from './store/store';
-  import spanner from './helpers/spanner'
+  import spanner from './helpers/spanner';
 
   export default {
     oncreate () {
@@ -50,17 +54,17 @@
 
     computed: {
       parsedBars: (bars) => {
-        const result = bars.map((bar, index) => {
+        const byTick = bars.map((bar, index) => {
           const spans = spanner(bar);
           return {
             index: index + 1,
             text: bar,
-            spans: spans
+            spans: spans,
           };
         });
 
-        console.log(result);
-        return result;
+        console.log(byTick);
+        return byTick;
       },
       barStyle: (position) => {
         return (index) => {
@@ -102,5 +106,53 @@
   .current {
     font-weight: bold;
     color: blueviolet;
+  }
+  .current .highlight-1,
+  .past .highlight-1 {
+    background-color: #66C5CC;
+  }
+  .current .highlight-2,
+  .past .highlight-2 {
+    background-color: #F6CF71;
+  }
+  .current .highlight-3,
+  .past .highlight-3 {
+    background-color: #F89C74;
+  }
+  .current .highlight-4,
+  .past .highlight-4 {
+    background-color: #DCB0F2;
+  }
+  .current .highlight-5,
+  .past .highlight-5 {
+    background-color: #87C55F;
+  }
+  .current .highlight-6,
+  .past .highlight-6 {
+    background-color: #9EB9F3;
+  }
+  .current .highlight-7,
+  .past .highlight-7 {
+    background-color: #FE88B1;
+  }
+  .current .highlight-8,
+  .past .highlight-8 {
+    background-color: #C9DB74;
+  }
+  .current .highlight-9,
+  .past .highlight-9 {
+    background-color: #8BE0A4;
+  }
+  .current .highlight-10,
+  .past .highlight-10 {
+    background-color: #B497E7;
+  }
+  .current .highlight-11,
+  .past .highlight-11 {
+    background-color: #D3B484;
+  }
+  .current .highlight-12,
+  .past .highlight-12 {
+    background-color: #B3B3B3;
   }
 </style>
