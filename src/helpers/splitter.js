@@ -7,8 +7,6 @@ const splitter = function (text, width) {
     let currentLine = '';
     let result;
     while ((result = word.exec(line)) !== null) {
-      console.log('> ', subLineIndex, ' ' , result[0], ' (', result.index, ', ', word.lastIndex, ') width ', width);
-
       if (word.lastIndex / width > subLineIndex) {
         subLineIndex = Math.floor(word.lastIndex / width);
       }

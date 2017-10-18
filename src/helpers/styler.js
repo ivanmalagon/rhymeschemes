@@ -20,12 +20,11 @@ const styler = function (text) {
 
     exec = spanRegex.exec(text);
   }
-  if (lastIndex === 0) {
-    slices.push(createSlice(text));
+  if (lastIndex < text.length) {
+    slices.push(createSlice(text.substring(lastIndex, text.length)));
   }
 
   return slices;
 };
 
 export default styler;
-// \[.+?\]\d

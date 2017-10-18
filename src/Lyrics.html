@@ -63,7 +63,6 @@
           };
         });
 
-        console.log(byTick);
         return byTick;
       },
       barStyle: (position) => {
@@ -96,16 +95,18 @@
   .bars {
     flex-grow: 1;
     font-family: Courier New, Courier, monospace;
+    color: lightgray;
   }
   ul {
     list-style-type: none;
   }
   .past {
     font-weight: bold;
+    color: black;
   }
   .current {
     font-weight: bold;
-    color: blueviolet;
+    color: black;
   }
   .current .highlight-1,
   .past .highlight-1 {
